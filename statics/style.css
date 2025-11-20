@@ -1,28 +1,72 @@
+/* General layout */
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: #f4f4f4;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
-h1 {
-    color: #333;
+
+/* Header and form spacing */
+h4 {
+    margin-bottom: 0;
+    font-weight: 600;
 }
+
 form {
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
-.tile {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
+
+/* Device card styling */
+.small-card {
+    font-size: 0.85rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
 }
-.green { background-color: #00cc66; color: white; }
-.red { background-color: #cc3333; color: white; }
-.yellow { background-color: #cccc00; color: black; }
-.gray { background-color: #eeeeee; color: black; }
-button {
-    margin: 5px;
-    padding: 8px 12px;
-    border: none;
+
+.small-card:hover {
+    transform: scale(1.02);
+}
+
+/* Card content */
+.card-body {
+    padding: 0.75rem;
+}
+
+.card-body .fw-bold {
+    font-size: 0.9rem;
+}
+
+.card-body .text-monospace {
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+/* Button layout */
+.card-body button {
+    font-size: 0.75rem;
+    padding: 4px 8px;
     border-radius: 4px;
-    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Button spacing */
+.card-body .btn {
+    margin: 2px;
+}
+
+/* MQTT modal styling */
+.modal-content input {
+    font-size: 0.9rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .card-body {
+        padding: 0.5rem;
+    }
+    .card-body button {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
 }

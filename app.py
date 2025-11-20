@@ -35,7 +35,7 @@ mqtt_client.loop_start()
 
 @app.route("/")
 def index():
-    return render_template("index.html", devices=devices, statuses=statuses, responses=responses)
+    return render_template("index.html", devices=devices, statuses=statuses, responses=responses, mqtt=MQTT_CONFIG)
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -67,6 +67,19 @@ def action():
     payload = json.dumps({"action": action})
     mqtt_client.publish(topic, payload)
     return jsonify({"status": "sent"})
+
+@app.route("/mqtt", methods=["POST"])
+def update_mqtt():
+    MQTT_CONFIG["host"] = request.form["host"]
+    MQTT_CONFIG["port"] = int(request.form["port"])
+    MQTT_CONFIG["username"] = request.form["username"]
+    MQTT_CONFIG["password"] = request.form["password"]
+    mqtt_client.loop_stop()
+    mqtt_client.disconnect()
+    mqtt_client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
+    mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"])
+    mqtt_client.loop_start()
+    return jsonify({"status": "updated"})
 
 if __name__ == "__main__":
     app.run(debug=True)

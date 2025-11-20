@@ -2,39 +2,88 @@
 <html>
 <head>
     <title>BLE Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <h1>📡 BLE Dashboard</h1>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" name="excel" accept=".xlsx">
-        <button type="submit">Upload Excel</button>
+<body class="bg-light">
+<div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>📡 BLE Dashboard</h4>
+        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#mqttModal">MQTT Settings</button>
+    </div>
+
+    <form id="uploadForm" class="mb-3" enctype="multipart/form-data">
+        <div class="input-group input-group-sm">
+            <input type="file" name="excel" accept=".xlsx" class="form-control">
+            <button class="btn btn-success" type="submit">Upload Excel</button>
+        </div>
     </form>
-    <div id="tiles">
+
+    <div class="row g-2">
         {% for device in devices %}
-        <div class="tile {{ 'green' if responses.get(device.MAC) == 'success' else 'red' if responses.get(device.MAC) == 'fail' else 'yellow' if statuses.get(device.MAC) == False else 'green' if statuses.get(device.MAC) == True else 'gray' }}">
-            <h3>{{ device.SerialNo }} - {{ device.MAC }}</h3>
-            {% for btn in device.buttons %}
-            <button onclick="sendAction('{{ device.MAC }}', '{{ btn.payload }}')">{{ btn.name }}</button>
-            {% endfor %}
-            <button onclick="sendAction('{{ device.MAC }}', 'heartbeat')">Check Status</button>
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card small-card {{ 'bg-success text-white' if responses.get(device.MAC) == 'success' else 'bg-danger text-white' if responses.get(device.MAC) == 'fail' else 'bg-warning' if statuses.get(device.MAC) == False else 'bg-success text-white' if statuses.get(device.MAC) == True else 'bg-secondary text-white' }}">
+                <div class="card-body p-2">
+                    <div class="fw-bold small">{{ device.SerialNo }}</div>
+                    <div class="text-monospace small mb-2">{{ device.MAC }}</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for btn in device.buttons %}
+                        <button class="btn btn-light btn-sm" onclick="sendAction('{{ device.MAC }}', '{{ btn.payload }}')">{{ btn.name }}</button>
+                        {% endfor %}
+                        <button class="btn btn-outline-light btn-sm" onclick="sendAction('{{ device.MAC }}', 'heartbeat')">Check Status</button>
+                    </div>
+                </div>
+            </div>
         </div>
         {% endfor %}
     </div>
-    <script>
-        document.getElementById("uploadForm").onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            await fetch("/upload", { method: "POST", body: formData });
-            location.reload();
-        };
-        async function sendAction(mac, action) {
-            await fetch("/action", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mac, action })
-            });
-        }
-    </script>
+</div>
+
+<!-- MQTT Settings Modal -->
+<div class="modal fade" id="mqttModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form class="modal-content" id="mqttForm">
+      <div class="modal-header">
+        <h5 class="modal-title">MQTT Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" name="host" class="form-control mb-2" placeholder="Host" value="{{ mqtt.host }}">
+        <input type="number" name="port" class="form-control mb-2" placeholder="Port" value="{{ mqtt.port }}">
+        <input type="text" name="username" class="form-control mb-2" placeholder="Username" value="{{ mqtt.username }}">
+        <input type="password" name="password" class="form-control mb-2" placeholder="Password" value="{{ mqtt.password }}">
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary btn-sm">Save & Reconnect</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById("uploadForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    await fetch("/upload", { method: "POST", body: formData });
+    location.reload();
+};
+
+document.getElementById("mqttForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    await fetch("/mqtt", { method: "POST", body: formData });
+    alert("MQTT settings updated");
+    bootstrap.Modal.getInstance(document.getElementById("mqttModal")).hide();
+};
+
+async function sendAction(mac, action) {
+    await fetch("/action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mac, action })
+    });
+}
+</script>
 </body>
 </html>
