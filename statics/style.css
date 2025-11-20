@@ -1,4 +1,4 @@
-/* General layout */
+/* Base layout */
 body {
     font-family: 'Segoe UI', Roboto, sans-serif;
     background-color: #f8f9fa;
@@ -22,6 +22,7 @@ form {
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: transform 0.2s ease;
+    min-height: 140px;
 }
 
 .small-card:hover {
@@ -40,6 +41,7 @@ form {
 .card-body .text-monospace {
     font-size: 0.8rem;
     opacity: 0.85;
+    word-break: break-word;
 }
 
 /* Button layout */
@@ -68,5 +70,8 @@ form {
     .card-body button {
         font-size: 0.7rem;
         padding: 3px 6px;
+    }
+    .small-card {
+        min-height: auto;
     }
 }

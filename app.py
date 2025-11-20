@@ -24,14 +24,19 @@ def on_message(client, userdata, msg):
             code = payload.get("code")
             message = payload.get("message")
             responses[mac] = "success" if code == 200 and message == "success" else "fail"
-    except:
-        pass
+    except Exception as e:
+        print("MQTT message error:", e)
 
-mqtt_client = mqtt.Client()
+mqtt_client = mqtt.Client(protocol=mqtt.MQTTv5)
 mqtt_client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
 mqtt_client.on_message = on_message
-mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"])
-mqtt_client.loop_start()
+
+try:
+    mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
+    mqtt_client.reconnect_delay_set(min_delay=1, max_delay=120)
+    mqtt_client.loop_start()
+except Exception as e:
+    print("MQTT connection failed:", e)
 
 @app.route("/")
 def index():
@@ -74,12 +79,16 @@ def update_mqtt():
     MQTT_CONFIG["port"] = int(request.form["port"])
     MQTT_CONFIG["username"] = request.form["username"]
     MQTT_CONFIG["password"] = request.form["password"]
-    mqtt_client.loop_stop()
-    mqtt_client.disconnect()
-    mqtt_client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
-    mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"])
-    mqtt_client.loop_start()
+    try:
+        mqtt_client.loop_stop()
+        mqtt_client.disconnect()
+        mqtt_client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
+        mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
+        mqtt_client.loop_start()
+    except Exception as e:
+        print("MQTT reconnect failed:", e)
     return jsonify({"status": "updated"})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
