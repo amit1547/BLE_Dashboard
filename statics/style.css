@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f4f4f4;
+}
+h1 {
+    color: #333;
+}
+form {
+    margin-bottom: 20px;
+}
+.tile {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+}
+.green { background-color: #00cc66; color: white; }
+.red { background-color: #cc3333; color: white; }
+.yellow { background-color: #cccc00; color: black; }
+.gray { background-color: #eeeeee; color: black; }
+button {
+    margin: 5px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

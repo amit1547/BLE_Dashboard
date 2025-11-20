@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BLE Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>📡 BLE Dashboard</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="excel" accept=".xlsx">
+        <button type="submit">Upload Excel</button>
+    </form>
+    <div id="tiles">
+        {% for device in devices %}
+        <div class="tile {{ 'green' if responses.get(device.MAC) == 'success' else 'red' if responses.get(device.MAC) == 'fail' else 'yellow' if statuses.get(device.MAC) == False else 'green' if statuses.get(device.MAC) == True else 'gray' }}">
+            <h3>{{ device.SerialNo }} - {{ device.MAC }}</h3>
+            {% for btn in device.buttons %}
+            <button onclick="sendAction('{{ device.MAC }}', '{{ btn.payload }}')">{{ btn.name }}</button>
+            {% endfor %}
+            <button onclick="sendAction('{{ device.MAC }}', 'heartbeat')">Check Status</button>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        document.getElementById("uploadForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await fetch("/upload", { method: "POST", body: formData });
+            location.reload();
+        };
+        async function sendAction(mac, action) {
+            await fetch("/action", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mac, action })
+            });
+        }
+    </script>
+</body>
+</html>

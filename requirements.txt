@@ -1,4 +1,4 @@
-streamlit
+flask
 paho-mqtt
 pandas
 openpyxl
