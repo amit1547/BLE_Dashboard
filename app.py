@@ -25,7 +25,7 @@ def upload():
                 payload = config["payload"].replace("{mac}", mac)
                 buttons.append({"name": config["name"], "topic": topic, "payload": payload})
             except Exception as e:
-                print("Button parse error:", e)
+                print("[Upload] Button parse error:", e)
                 buttons.append({"name": f"{b} (Invalid)", "topic": "", "payload": ""})
         devices.append({"MAC": mac, "SerialNo": serial, "buttons": buttons})
         mqtt_client.subscribe(f"{mac}/status")
@@ -40,7 +40,7 @@ def action():
     payload = json.dumps({"action": action})
 
     print(f"[MQTT] Publishing to {topic}: {payload}")
-    result = mqtt_client.publish(topic, payload, qos=1, retain=False)
+    result = mqtt_client.publish(topic, payload, qos=0, retain=False)
     print(f"[MQTT] Publish result code: {result.rc}")
 
     if result.rc != 0:
