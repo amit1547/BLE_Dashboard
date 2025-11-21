@@ -41,15 +41,15 @@ def create_client():
         print("[MQTT] Connection failed:", e)
     return client
 
-def reconnect(client):
+def reconnect(old_client):
     try:
-        client.loop_stop()
-        client.disconnect()
-        client = create_client()
+        old_client.loop_stop()
+        old_client.disconnect()
+        new_client = create_client()
         print("[MQTT] Reconnected")
-        return client
+        return new_client
     except Exception as e:
         print("[MQTT] Reconnect failed:", e)
-        return client
+        return old_client
 
 mqtt_client = create_client()

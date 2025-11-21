@@ -4,6 +4,7 @@ import mqtt_handler
 
 app = Flask(__name__)
 devices = []
+
 mqtt_client = mqtt_handler.mqtt_client
 statuses = mqtt_handler.statuses
 responses = mqtt_handler.responses
@@ -38,6 +39,8 @@ def upload():
 
 @app.route("/action", methods=["POST"])
 def action():
+    global mqtt_client
+
     mac = request.json["mac"]
     action = request.json["action"]
     topic = f"{mac}/action"
@@ -55,6 +58,8 @@ def action():
 
 @app.route("/mqtt", methods=["POST"])
 def update_mqtt():
+    global mqtt_client
+
     MQTT_CONFIG["host"] = request.form["host"]
     MQTT_CONFIG["port"] = int(request.form["port"])
     MQTT_CONFIG["username"] = request.form["username"]
