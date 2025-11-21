@@ -5,7 +5,7 @@ statuses = {}
 responses = {}
 
 MQTT_CONFIG = {
-    "host": os.getenv("MQTT_HOST", "test-2-mqtt.syookisnite.com"),
+    "host": os.getenv("MQTT_HOST", "test-2-mqtt.syookinsite.com"),
     "port": int(os.getenv("MQTT_PORT", 1883)),
     "username": os.getenv("MQTT_USER", "tnt"),
     "password": os.getenv("MQTT_PASS", "syook2018")
