@@ -33,33 +33,28 @@ def upload():
                 print("[Upload] Button parse error:", e)
                 buttons.append({"name": f"{b} (Invalid)", "topic": "", "payload": ""})
         devices.append({"MAC": mac, "SerialNo": serial, "buttons": buttons})
-        mqtt_client.subscribe(f"{mac}/status")
+        mqtt_client.subscribe(f"{mac}/status")  # Always subscribe to status
         mqtt_client.subscribe(f"{mac}/action/response")
     return jsonify({"status": "ok"})
 
 @app.route("/action", methods=["POST"])
 def action():
     global mqtt_client
-
     mac = request.json["mac"]
     action = request.json["action"]
     topic = f"{mac}/action"
     payload = json.dumps({"action": action})
-
     print(f"[MQTT] Publishing to {topic}: {payload}")
     result = mqtt_client.publish(topic, payload, qos=0, retain=False)
     print(f"[MQTT] Publish result code: {result.rc}")
-
     if result.rc != 0:
         print("[MQTT] Publish failed, reconnecting...")
         mqtt_client = mqtt_handler.reconnect(mqtt_client)
-
     return jsonify({"status": "sent", "topic": topic, "payload": payload, "result": result.rc})
 
 @app.route("/mqtt", methods=["POST"])
 def update_mqtt():
     global mqtt_client
-
     MQTT_CONFIG["host"] = request.form["host"]
     MQTT_CONFIG["port"] = int(request.form["port"])
     MQTT_CONFIG["username"] = request.form["username"]

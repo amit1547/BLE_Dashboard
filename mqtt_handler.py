@@ -5,10 +5,10 @@ statuses = {}
 responses = {}
 
 MQTT_CONFIG = {
-    "host": os.getenv("MQTT_HOST", "broker.hivemq.com"),
+    "host": os.getenv("MQTT_HOST", "test-2-mqtt.syookisnite.com"),
     "port": int(os.getenv("MQTT_PORT", 1883)),
-    "username": os.getenv("MQTT_USER"),
-    "password": os.getenv("MQTT_PASS")
+    "username": os.getenv("MQTT_USER", "tnt"),
+    "password": os.getenv("MQTT_PASS", "syook2018")
 }
 
 def on_connect(client, userdata, flags, rc, properties=None):

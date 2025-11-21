@@ -1,77 +1,45 @@
-/* Base layout */
 body {
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", Roboto, sans-serif;
 }
 
-/* Header and form spacing */
 h4 {
-    margin-bottom: 0;
-    font-weight: 600;
+  font-weight: 600;
+  color: #333;
 }
 
-form {
-    margin-bottom: 1rem;
+.card.small-card {
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
 }
 
-/* Device card styling */
-.small-card {
-    font-size: 0.85rem;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease;
-    min-height: 140px;
+.card.small-card:hover {
+  transform: scale(1.02);
 }
 
-.small-card:hover {
-    transform: scale(1.02);
-}
-
-/* Card content */
 .card-body {
-    padding: 0.75rem;
+  padding: 0.75rem 1rem;
 }
 
-.card-body .fw-bold {
-    font-size: 0.9rem;
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
 }
 
-.card-body .text-monospace {
-    font-size: 0.8rem;
-    opacity: 0.85;
-    word-break: break-word;
+.text-monospace {
+  font-family: monospace;
+  font-size: 0.8rem;
 }
 
-/* Button layout */
-.card-body button {
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
+.settings-icon {
+  transition: color 0.2s ease;
 }
 
-/* Button spacing */
-.card-body .btn {
-    margin: 2px;
+.settings-icon:hover {
+  color: #007bff;
 }
 
-/* MQTT modal styling */
-.modal-content input {
-    font-size: 0.9rem;
-}
-
-/* Responsive tweaks */
-@media (max-width: 576px) {
-    .card-body {
-        padding: 0.5rem;
-    }
-    .card-body button {
-        font-size: 0.7rem;
-        padding: 3px 6px;
-    }
-    .small-card {
-        min-height: auto;
-    }
+#mqttPanel input {
+  font-size: 0.85rem;
 }
