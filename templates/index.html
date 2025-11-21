@@ -36,8 +36,8 @@
     <div class="col">
       <div class="card small-card {{ 'bg-success text-white' if statuses.get(device.MAC) else 'bg-warning' }}">
         <div class="card-body py-2 px-3">
-          <div class="fw-bold small">{{ loop.index }}. {{ device.MAC }}</div>
-          <div class="text-monospace small">{{ device.SerialNo }}</div>
+          <div class="fw-bold small">{{ device.SerialNo }}.{{ device.MAC }}</div>
+          <div class="text-monospace small"></div>
           <div class="mt-2 d-flex flex-wrap gap-1">
             {% for btn in device.buttons %}
             <button class="btn btn-outline-light btn-sm"
