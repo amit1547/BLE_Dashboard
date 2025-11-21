@@ -1,16 +1,17 @@
-import os, json
-import paho.mqtt.client as mqtt
+import os, json, paho.mqtt.client as mqtt
 
-# Global state
 statuses = {}
 responses = {}
 
 MQTT_CONFIG = {
-    "host": os.getenv("MQTT_HOST", "test-2-mqtt.syookinsite.com"),
+    "host": os.getenv("MQTT_HOST", "broker.hivemq.com"),  # test broker
     "port": int(os.getenv("MQTT_PORT", 1883)),
-    "username": os.getenv("MQTT_USER", "tnt"),
-    "password": os.getenv("MQTT_PASS", "syook2018")
+    "username": os.getenv("MQTT_USER"),
+    "password": os.getenv("MQTT_PASS")
 }
+
+def on_connect(client, userdata, flags, reason_code, properties=None):
+    print("Connected to MQTT broker with code:", reason_code)
 
 def on_message(client, userdata, msg):
     mac = msg.topic.split("/")[0]
@@ -27,27 +28,16 @@ def on_message(client, userdata, msg):
 
 def create_client():
     client = mqtt.Client(protocol=mqtt.MQTTv5)
-    client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
+    if MQTT_CONFIG["username"] and MQTT_CONFIG["password"]:
+        client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
+    client.on_connect = on_connect
     client.on_message = on_message
     try:
         client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
-        client.reconnect_delay_set(min_delay=1, max_delay=120)
         client.loop_start()
         print("MQTT connected to", MQTT_CONFIG["host"], MQTT_CONFIG["port"])
     except Exception as e:
         print("MQTT connection failed:", e)
     return client
 
-def reconnect(client):
-    try:
-        client.loop_stop()
-        client.disconnect()
-        client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
-        client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
-        client.loop_start()
-        print("MQTT reconnected")
-    except Exception as e:
-        print("MQTT reconnect failed:", e)
-
-# Initialize client
 mqtt_client = create_client()
