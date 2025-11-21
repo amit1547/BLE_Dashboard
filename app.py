@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd, json, os
-from mqtt_handler import mqtt_client, statuses, responses, MQTT_CONFIG, reconnect
+import mqtt_handler
 
 app = Flask(__name__)
 devices = []
+mqtt_client = mqtt_handler.mqtt_client
+statuses = mqtt_handler.statuses
+responses = mqtt_handler.responses
+MQTT_CONFIG = mqtt_handler.MQTT_CONFIG
 
 @app.route("/")
 def index():
@@ -44,8 +48,8 @@ def action():
     print(f"[MQTT] Publish result code: {result.rc}")
 
     if result.rc != 0:
-        print("[MQTT] Publish failed, attempting reconnect...")
-        reconnect(mqtt_client)
+        print("[MQTT] Publish failed, reconnecting...")
+        mqtt_client = mqtt_handler.reconnect(mqtt_client)
 
     return jsonify({"status": "sent", "topic": topic, "payload": payload, "result": result.rc})
 
@@ -55,7 +59,7 @@ def update_mqtt():
     MQTT_CONFIG["port"] = int(request.form["port"])
     MQTT_CONFIG["username"] = request.form["username"]
     MQTT_CONFIG["password"] = request.form["password"]
-    reconnect(mqtt_client)
+    mqtt_client = mqtt_handler.reconnect(mqtt_client)
     return jsonify({"status": "updated"})
 
 if __name__ == "__main__":
