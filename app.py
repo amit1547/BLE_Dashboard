@@ -1,42 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd, json, os
-import paho.mqtt.client as mqtt
+from mqtt_handler import mqtt_client, statuses, responses, MQTT_CONFIG, reconnect
 
 app = Flask(__name__)
 devices = []
-statuses = {}
-responses = {}
-
-MQTT_CONFIG = {
-    "host": os.getenv("MQTT_HOST", "test-2-mqtt.syookinsite.com"),
-    "port": int(os.getenv("MQTT_PORT", 1883)),
-    "username": os.getenv("MQTT_USER", "tnt"),
-    "password": os.getenv("MQTT_PASS", "syook2018")
-}
-
-def on_message(client, userdata, msg):
-    mac = msg.topic.split("/")[0]
-    try:
-        payload = json.loads(msg.payload.decode())
-        if msg.topic.endswith("/status"):
-            statuses[mac] = payload.get("isAlive")
-        elif msg.topic.endswith("/action/response"):
-            code = payload.get("code")
-            message = payload.get("message")
-            responses[mac] = "success" if code == 200 and message == "success" else "fail"
-    except Exception as e:
-        print("MQTT message error:", e)
-
-mqtt_client = mqtt.Client(protocol=mqtt.MQTTv5)
-mqtt_client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
-mqtt_client.on_message = on_message
-
-try:
-    mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
-    mqtt_client.reconnect_delay_set(min_delay=1, max_delay=120)
-    mqtt_client.loop_start()
-except Exception as e:
-    print("MQTT connection failed:", e)
 
 @app.route("/")
 def index():
@@ -79,14 +46,7 @@ def update_mqtt():
     MQTT_CONFIG["port"] = int(request.form["port"])
     MQTT_CONFIG["username"] = request.form["username"]
     MQTT_CONFIG["password"] = request.form["password"]
-    try:
-        mqtt_client.loop_stop()
-        mqtt_client.disconnect()
-        mqtt_client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
-        mqtt_client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
-        mqtt_client.loop_start()
-    except Exception as e:
-        print("MQTT reconnect failed:", e)
+    reconnect(mqtt_client)
     return jsonify({"status": "updated"})
 
 if __name__ == "__main__":
