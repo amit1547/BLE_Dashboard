@@ -1,10 +1,13 @@
-import os, json, paho.mqtt.client as mqtt
+import os, json
+import paho.mqtt.client as mqtt
 
+# Global state dictionaries
 statuses = {}
 responses = {}
 
+# MQTT configuration from environment variables
 MQTT_CONFIG = {
-    "host": os.getenv("MQTT_HOST", "broker.hivemq.com"),  # test broker
+    "host": os.getenv("MQTT_HOST", "broker.hivemq.com"),  # default public broker
     "port": int(os.getenv("MQTT_PORT", 1883)),
     "username": os.getenv("MQTT_USER"),
     "password": os.getenv("MQTT_PASS")
@@ -34,10 +37,24 @@ def create_client():
     client.on_message = on_message
     try:
         client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
+        client.reconnect_delay_set(min_delay=1, max_delay=120)
         client.loop_start()
         print("MQTT connected to", MQTT_CONFIG["host"], MQTT_CONFIG["port"])
     except Exception as e:
         print("MQTT connection failed:", e)
     return client
 
+def reconnect(client):
+    try:
+        client.loop_stop()
+        client.disconnect()
+        if MQTT_CONFIG["username"] and MQTT_CONFIG["password"]:
+            client.username_pw_set(MQTT_CONFIG["username"], MQTT_CONFIG["password"])
+        client.connect(MQTT_CONFIG["host"], MQTT_CONFIG["port"], keepalive=60)
+        client.loop_start()
+        print("MQTT reconnected")
+    except Exception as e:
+        print("MQTT reconnect failed:", e)
+
+# Initialize client once
 mqtt_client = create_client()
