@@ -24,7 +24,8 @@ def upload():
                 topic = config["publish Topic"].replace("{mac}", mac)
                 payload = config["payload"].replace("{mac}", mac)
                 buttons.append({"name": config["name"], "topic": topic, "payload": payload})
-            except:
+            except Exception as e:
+                print("Button parse error:", e)
                 buttons.append({"name": f"{b} (Invalid)", "topic": "", "payload": ""})
         devices.append({"MAC": mac, "SerialNo": serial, "buttons": buttons})
         mqtt_client.subscribe(f"{mac}/status")
@@ -37,8 +38,16 @@ def action():
     action = request.json["action"]
     topic = f"{mac}/action"
     payload = json.dumps({"action": action})
-    mqtt_client.publish(topic, payload)
-    return jsonify({"status": "sent"})
+
+    print(f"[MQTT] Publishing to {topic}: {payload}")
+    result = mqtt_client.publish(topic, payload, qos=1, retain=False)
+    print(f"[MQTT] Publish result code: {result.rc}")
+
+    if result.rc != 0:
+        print("[MQTT] Publish failed, attempting reconnect...")
+        reconnect(mqtt_client)
+
+    return jsonify({"status": "sent", "topic": topic, "payload": payload, "result": result.rc})
 
 @app.route("/mqtt", methods=["POST"])
 def update_mqtt():
